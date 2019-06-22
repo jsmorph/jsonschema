@@ -62,11 +62,18 @@ type Type struct {
 	Not                  *Type            `json:"not,omitempty"`                  // section 5.25
 	Definitions          Definitions      `json:"definitions,omitempty"`          // section 5.26
 	// RFC draft-wright-json-schema-validation-00, section 6, 7
-	Title       string        `json:"title,omitempty"`       // section 6.1
-	Description string        `json:"description,omitempty"` // section 6.1
-	Default     interface{}   `json:"default,omitempty"`     // section 6.2
-	Format      string        `json:"format,omitempty"`      // section 7
-	Examples    []interface{} `json:"examples,omitempty"`    // section 7.4
+	Title       string `json:"title,omitempty"`       // section 6.1
+	Description string `json:"description,omitempty"` // section 6.1
+
+	// PropertyOrder is an optional annotation to specify the
+	// order of this property (and hopefully it is a property) for
+	// the benefit of
+	// https://github.com/json-editor/json-editor#property-ordering.
+	PropertyOrder int `json:"propertyOrder,omitempty"`
+
+	Default  interface{}   `json:"default,omitempty"`  // section 6.2
+	Format   string        `json:"format,omitempty"`   // section 7
+	Examples []interface{} `json:"examples,omitempty"` // section 7.4
 	// RFC draft-wright-json-schema-hyperschema-00, section 4
 	Media          *Type  `json:"media,omitempty"`          // section 4.3
 	BinaryEncoding string `json:"binaryEncoding,omitempty"` // section 4.3
@@ -338,6 +345,10 @@ func (t *Type) genericKeywords(tags []string) {
 				t.Title = val
 			case "description":
 				t.Description = val
+			case "propertyOrder":
+				if n, err := strconv.ParseInt(val, 10, 32); err == nil {
+					t.PropertyOrder = int(n)
+				}
 			}
 		}
 	}
