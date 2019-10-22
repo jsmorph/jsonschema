@@ -114,3 +114,10 @@ func TestSchemaGeneration(t *testing.T) {
 		})
 	}
 }
+
+func TestComma(t *testing.T) {
+	ss := split("a,b\\,c,d")
+	if len(ss) != 3 || ss[2] != "d" {
+		t.Fatal(ss)
+	}
+}

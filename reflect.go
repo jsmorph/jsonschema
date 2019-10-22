@@ -11,6 +11,7 @@ import (
 	"net"
 	"net/url"
 	"reflect"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -481,6 +482,9 @@ func requiredFromJSONSchemaTags(tags []string) bool {
 		if tag == "required" {
 			return true
 		}
+		if tag == "optional" {
+			return false
+		}
 	}
 	return false
 }
@@ -491,6 +495,24 @@ func ignoredByJSONTags(tags []string) bool {
 
 func ignoredByJSONSchemaTags(tags []string) bool {
 	return tags[0] == "-"
+}
+
+var comma = regexp.MustCompile(`(?:[^\\]),`)
+
+// split is an attempt to replace regexp.Split that works with
+// non-capturing groups.
+var split = func(s string) []string {
+	acc := make([]string, 0, 32)
+	for {
+		loc := comma.FindStringIndex(s)
+		if loc == nil {
+			acc = append(acc, s)
+			break
+		}
+		acc = append(acc, s[0:loc[0]+1])
+		s = s[loc[1]:]
+	}
+	return acc
 }
 
 func (r *Reflector) reflectFieldName(f reflect.StructField) (string, bool, bool) {
@@ -505,7 +527,7 @@ func (r *Reflector) reflectFieldName(f reflect.StructField) (string, bool, bool)
 		return "", exist, false
 	}
 
-	jsonSchemaTags := strings.Split(f.Tag.Get("jsonschema"), ",")
+	jsonSchemaTags := split(f.Tag.Get("jsonschema"))
 	if ignoredByJSONSchemaTags(jsonSchemaTags) {
 		return "", exist, false
 	}
