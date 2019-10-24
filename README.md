@@ -23,6 +23,8 @@ type TestUser struct {
 }
 ```
 
+(A value can contain an escaped comma.)
+
 Results in following JSON Schema:
 
 ```go
