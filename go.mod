@@ -1,3 +1,3 @@
-module github.com/jsmorph/jsonschema/v2
+module github.com/jsmorph/jsonschema
 
 go 1.13
